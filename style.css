@@ -1,0 +1,89 @@
+:root{
+  --bg:#F8F1EC; --surface:#FFFFFF; --text:#2B1F1D; --text-muted:#7A6B66;
+  --red:#9C2B2B; --red-dark:#7A1F1F; --red-soft:#F3DEDE;
+  --green:#2F7A4F; --green-dark:#235C3B; --green-soft:#DCEFE2;
+  --border:#E4D7CF;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Inter',sans-serif; background:var(--bg); color:var(--text);}
+h1,h2,h3,.brand{font-family:'Fraunces',serif;}
+
+button{font-family:inherit; cursor:pointer; border:none; border-radius:8px;}
+
+/* LANDING */
+.landing{display:none; min-height:100vh; align-items:center; justify-content:center;}
+.landing.active{display:flex;}
+.landing-inner{text-align:center; max-width:520px;}
+.landing .brand{color:var(--red); font-size:1.1rem; margin-bottom:8px;}
+.landing h1{font-size:2.2rem; margin-bottom:32px;}
+.role-cards{display:flex; flex-direction:column; gap:12px;}
+.role-card{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:18px 20px; text-align:left; display:flex; flex-direction:column; gap:4px;
+  transition:border-color .15s;}
+.role-card:hover{border-color:var(--red);}
+.role-name{font-weight:600; color:var(--red);}
+.role-desc{color:var(--text-muted); font-size:.9rem;}
+
+/* APP SHELL */
+.app-shell{display:none;}
+.app-shell.active{display:block;}
+.topbar{display:flex; justify-content:space-between; align-items:center;
+  padding:14px 24px; background:var(--surface); border-bottom:1px solid var(--border);}
+.topbar .brand{color:var(--red); font-size:1.2rem;}
+.topbar-right{display:flex; align-items:center; gap:12px;}
+.role-badge{background:var(--red-soft); color:var(--red-dark); padding:4px 12px;
+  border-radius:20px; font-size:.8rem; font-weight:500;}
+.ghost{background:transparent; color:var(--text-muted); padding:6px 10px;}
+.ghost:hover{color:var(--red);}
+
+.layout{display:flex; min-height:calc(100vh - 57px);}
+.sidebar{display:none; flex-direction:column; gap:4px; width:200px;
+  padding:20px 12px; border-right:1px solid var(--border);}
+.sidebar.active{display:flex;}
+.sidebar button{background:transparent; text-align:left; padding:10px 12px;
+  border-radius:8px; color:var(--text);}
+.sidebar button:hover{background:var(--red-soft); color:var(--red-dark);}
+
+.content{flex:1; padding:32px;}
+.content-screen{display:none;}
+.content-screen.active{display:block;}
+
+.back{background:transparent; color:var(--text-muted); font-size:1.1rem; margin-bottom:8px;}
+.back:hover{color:var(--red);}
+
+/* CARDS */
+.grid-cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:16px; margin-top:20px;}
+.restaurant-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;}
+.restaurant-card .price{color:var(--text-muted); margin:6px 0 14px;}
+
+.stat-card{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:20px; display:flex; flex-direction:column; gap:4px;}
+.stat-num{font-family:'Fraunces',serif; font-size:1.6rem; color:var(--red);}
+
+/* BUTTONS */
+.primary{background:var(--red); color:#fff; padding:10px 18px; font-weight:500;}
+.primary:hover{background:var(--red-dark);}
+.danger{background:var(--red-soft); color:var(--red-dark); padding:6px 12px; font-size:.85rem;}
+
+/* MESAS */
+.floor-grid{display:grid; grid-template-columns:repeat(6,56px); gap:10px; margin:20px 0;}
+.mesa{aspect-ratio:1; border-radius:10px; font-weight:600; color:#fff;}
+.mesa.disponible{background:var(--green);}
+.mesa.disponible:hover{background:var(--green-dark);}
+.mesa.ocupada{background:var(--text-muted); opacity:.5; cursor:not-allowed;}
+.legend{display:flex; gap:18px; color:var(--text-muted); font-size:.85rem;}
+.legend .dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px;}
+.dot.disponible{background:var(--green);}
+.dot.ocupada{background:var(--text-muted);}
+
+/* FORM */
+.form{display:flex; flex-direction:column; max-width:320px; gap:6px; margin-top:20px;}
+.form label{font-size:.85rem; color:var(--text-muted); margin-top:8px;}
+.form input{padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--surface);}
+.form button{margin-top:16px; align-self:flex-start;}
+
+/* TABLE */
+table{width:100%; border-collapse:collapse; margin-top:20px; background:var(--surface);
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;}
+th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--border);}
+th{color:var(--text-muted); font-weight:500; font-size:.85rem;}

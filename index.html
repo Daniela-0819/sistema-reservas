@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SELECCIÓN DE ROL -->
+<section id="landing" class="landing active">
+  <div class="landing-inner">
+    <p class="brand">Reservas</p>
+    <h1>Entra como</h1>
+    <div class="role-cards">
+      <button class="role-card" onclick="selectRole('cliente')">
+        <span class="role-name">Cliente</span>
+        <span class="role-desc">Explora restaurantes y reserva mesa</span>
+      </button>
+      <button class="role-card" onclick="selectRole('dueno')">
+        <span class="role-name">Dueño</span>
+        <span class="role-desc">Administra tu restaurante</span>
+      </button>
+      <button class="role-card" onclick="selectRole('admin')">
+        <span class="role-name">Administrador</span>
+        <span class="role-desc">Estadísticas globales</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app-shell" class="app-shell">
+  <header class="topbar">
+    <span class="brand">Reservas</span>
+    <div class="topbar-right">
+      <span id="role-badge" class="role-badge"></span>
+      <button class="ghost" onclick="backToRoles()" aria-label="Cambiar rol">Cambiar rol</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar-cliente">
+      <button onclick="showScreen('cliente-restaurantes')">Restaurantes</button>
+      <button onclick="showScreen('cliente-stats')">Estadísticas</button>
+    </nav>
+    <nav class="sidebar" id="sidebar-dueno">
+      <button onclick="showScreen('dueno-registrar')">Mi restaurante</button>
+      <button onclick="showScreen('dueno-mesas')">Mesas</button>
+      <button onclick="showScreen('dueno-reservas')">Reservas</button>
+    </nav>
+    <nav class="sidebar" id="sidebar-admin">
+      <button onclick="showScreen('admin-stats')">Estadísticas</button>
+    </nav>
+
+    <main class="content">
+
+      <!-- CLIENTE -->
+      <section id="cliente-restaurantes" class="content-screen">
+        <h2>Restaurantes</h2>
+        <div class="grid-cards">
+          <article class="restaurant-card">
+            <h3>La Parrilla</h3>
+            <p class="price">$15.000</p>
+            <button class="primary" onclick="showScreen('cliente-mesas')">Ver mesas</button>
+          </article>
+          <article class="restaurant-card">
+            <h3>Sushi House</h3>
+            <p class="price">$20.000</p>
+            <button class="primary" onclick="showScreen('cliente-mesas')">Ver mesas</button>
+          </article>
+          <article class="restaurant-card">
+            <h3>Café Terra</h3>
+            <p class="price">$10.000</p>
+            <button class="primary" onclick="showScreen('cliente-mesas')">Ver mesas</button>
+          </article>
+        </div>
+      </section>
+
+      <section id="cliente-mesas" class="content-screen">
+        <button class="back" onclick="showScreen('cliente-restaurantes')" aria-label="Volver">←</button>
+        <h2>Mesas</h2>
+        <div class="floor-grid">
+          <button class="mesa disponible">1</button>
+          <button class="mesa disponible">2</button>
+          <button class="mesa ocupada" disabled>3</button>
+          <button class="mesa disponible">4</button>
+          <button class="mesa disponible">5</button>
+          <button class="mesa ocupada" disabled>6</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot disponible"></i>Disponible</span>
+          <span><i class="dot ocupada"></i>Ocupada</span>
+        </div>
+      </section>
+
+      <section id="cliente-stats" class="content-screen">
+        <h2>Estadísticas</h2>
+        <div class="grid-cards stats">
+          <div class="stat-card"><span class="stat-num">4</span><span>Reservas</span></div>
+          <div class="stat-card"><span class="stat-num">La Parrilla</span><span>Favorito</span></div>
+        </div>
+      </section>
+
+      <!-- DUEÑO -->
+      <section id="dueno-registrar" class="content-screen">
+        <h2>Mi restaurante</h2>
+        <form onsubmit="return false;" class="form">
+          <label>Nombre</label>
+          <input type="text" placeholder="La Parrilla">
+          <label>Precio reserva</label>
+          <input type="number" placeholder="15000">
+          <label>Duración (min)</label>
+          <input type="number" placeholder="90">
+          <button type="submit" class="primary">Guardar</button>
+        </form>
+      </section>
+
+      <section id="dueno-mesas" class="content-screen">
+        <h2>Mesas</h2>
+        <div class="floor-grid">
+          <button class="mesa disponible">1</button>
+          <button class="mesa disponible">2</button>
+          <button class="mesa disponible">3</button>
+        </div>
+        <button class="primary">Agregar mesa</button>
+      </section>
+
+      <section id="dueno-reservas" class="content-screen">
+        <h2>Reservas</h2>
+        <table>
+          <tr><th>Cliente</th><th>Mesa</th><th>Hora</th><th></th></tr>
+          <tr><td>Daniela</td><td>2</td><td>7:00 PM</td><td><button class="danger">Cancelar</button></td></tr>
+        </table>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="admin-stats" class="content-screen">
+        <h2>Estadísticas generales</h2>
+        <div class="grid-cards stats">
+          <div class="stat-card"><span class="stat-num">12</span><span>Restaurantes</span></div>
+          <div class="stat-card"><span class="stat-num">230</span><span>Reservas</span></div>
+          <div class="stat-card"><span class="stat-num">$3.450.000</span><span>Ingresos</span></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
