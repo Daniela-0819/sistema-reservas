@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAVORIA — Reservas de Restaurantes</title>
+  <meta name="description"
+    content="SAVORIA: descubre restaurantes, reserva tu mesa en segundos y gestiona tu negocio desde un solo lugar.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Fondo: burbujas difuminadas CSS -->
+  <div class="bubble-bg" aria-hidden="true">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="bubble bubble-3"></div>
+    <div class="bubble bubble-4"></div>
+    <div class="bubble bubble-5"></div>
+    <div class="bubble bubble-6"></div>
+    <div class="bubble bubble-7"></div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page active">
+
+    <!-- NAV -->
+    <nav class="nav" id="main-nav">
+      <a class="nav-brand" href="#"><span class="brand-dot"></span>SAVORIA</a>
+      <ul class="nav-links">
+        <li><a href="#features">Características</a></li>
+        <li><a href="#how">Cómo funciona</a></li>
+        <li><a href="#stats">Números</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn-login" id="btn-login" onclick="openAuth()">Iniciar sesión <i
+            class="fa-solid fa-arrow-right"></i></button>
+        <span id="nav-session" class="hidden">
+          <button class="btn-login" onclick="enterApp()"><i class="fa-solid fa-table-columns"></i> Mi panel</button>
+          <button class="btn-ghost-sm" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar
+            sesión</button>
+        </span>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-tag"><span class="tag-dot"></span>Experiencias gastronómicas únicas</div>
+      <h1 class="hero-title">Tu mesa favorita,<br><em>a un clic de distancia</em></h1>
+      <p class="hero-sub"> Descubre restaurantes únicos, reserva en segundos y vive experiencias gastronómicas que
+        quedarán en tu memoria.</p>
+      <div class="hero-ctas">
+        <button class="btn-primary" onclick="openAuth()">Reservar ahora <i class="fa-solid fa-arrow-right"></i></button>
+        <a href="#features" class="btn-ghost">Ver características <i class="fa-solid fa-arrow-down"></i></a>
+      </div>
+
+      <!-- Floating cards de preview -->
+      <div class="hero-cards">
+        <div class="hcard hcard-1">
+          <span class="hcard-icon"><i class="fa-solid fa-wine-glass text-rose"></i></span>
+          <div>
+            <strong>La Parrilla</strong>
+            <p>Mesa 4 · 7:30 PM</p>
+          </div>
+          <span class="hcard-badge confirmed">Confirmada</span>
+        </div>
+        <div class="hcard hcard-2">
+          <span class="hcard-icon"><i class="fa-solid fa-utensils text-olive"></i></span>
+          <div>
+            <strong>Sushi House</strong>
+            <p>Mesa 2 · 8:00 PM</p>
+          </div>
+          <span class="hcard-badge pending">Pendiente</span>
+        </div>
+        <div class="hcard hcard-3">
+          <div class="hcard-stat">
+            <span class="stat-big">230+</span>
+            <span>reservas hoy</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+      <div class="section-label">Características</div>
+      <h2 class="section-title">Todo lo que necesitas,<br>en un solo lugar</h2>
+
+      <div class="features-grid">
+        <div class="feat-card" id="feat-1">
+          <div class="feat-icon"><i class="fa-solid fa-compass text-olive"></i></div>
+          <h3>Explora restaurantes</h3>
+          <p>Descubre opciones gastronómicas con precios, disponibilidad y reseñas en tiempo real.</p>
+        </div>
+        <div class="feat-card" id="feat-2">
+          <div class="feat-icon"><i class="fa-solid fa-bolt text-rose"></i></div>
+          <h3>Reserva en segundos</h3>
+          <p>Visualiza el mapa de mesas y reserva con un clic. Sin llamadas, sin esperas.</p>
+        </div>
+        <div class="feat-card" id="feat-3">
+          <div class="feat-icon"><i class="fa-solid fa-store text-olive"></i></div>
+          <h3>Gestión para dueños</h3>
+          <p>Administra mesas, acepta o cancela reservas y monitorea tu negocio desde un panel intuitivo.</p>
+        </div>
+        <div class="feat-card" id="feat-4">
+          <div class="feat-icon"><i class="fa-solid fa-chart-pie text-rose"></i></div>
+          <h3>Analítica global</h3>
+          <p>Estadísticas en tiempo real para administradores: ingresos, ocupación y tendencias.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how" id="how">
+      <div class="section-label">Cómo funciona</div>
+      <h2 class="section-title">Tres pasos hacia<br><em>tu experiencia perfecta</em></h2>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-line"></div>
+          <h3>Elige tu perfil</h3>
+          <p>Cliente, dueño de restaurante o administrador — cada uno con su propio panel.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-line"></div>
+          <h3>Explora o gestiona</h3>
+          <p>Los clientes eligen restaurante y mesa; los dueños configuran todo desde cero.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-line"></div>
+          <h3>Disfruta la experiencia</h3>
+          <p>Reserva confirmada al instante. El restaurante recibe notificación inmediata.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section" id="stats">
+      <div class="stats-inner">
+        <div class="stat-pill">
+          <span class="stat-pill-num" data-count="1200">0</span>
+          <span class="stat-pill-label">Usuarios activos</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num" data-count="48">0</span>
+          <span class="stat-pill-label">Restaurantes</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num" data-count="9800">0</span>
+          <span class="stat-pill-label">Reservas realizadas</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-num" data-count="98" data-suffix="%">0</span>
+          <span class="stat-pill-label">Satisfacción</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="cta-banner">
+      <h2>¿Listo para comenzar?</h2>
+      <p>Únete a miles de usuarios que ya disfrutan de experiencias gastronómicas sin complicaciones.</p>
+      <button class="btn-primary large" onclick="openAuth()">
+        Ingresar a la plataforma <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span class="nav-brand"><span class="brand-dot"></span>SAVORIA</span>
+      <p>© 2026 SAVORIA. Todos los derechos reservados.</p>
+    </footer>
+
+  </div>
+
+  <!-- MODAL INICIAR SESIÓN / REGISTRARSE -->
+  <div id="login-overlay" class="login-overlay" onclick="closeModalOutside(event)">
+    <div class="login-modal" id="login-modal" role="dialog" aria-modal="true">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+
+      <!-- Paso 1: elegir perfil -->
+      <div id="pane-roles">
+        <div class="modal-header">
+          <div class="modal-badge"><span class="tag-dot"></span>Acceso seguro</div>
+          <h2>¿Con qué perfil<br>ingresas hoy?</h2>
+          <p>Elige tu perfil para iniciar sesión o crear tu cuenta.</p>
+        </div>
+        <div class="modal-cards">
+          <button class="role-card" onclick="selectRole('cliente')">
+            <div class="role-icon"><i class="fa-solid fa-utensils"></i></div>
+            <div class="role-info"><span class="role-name">Cliente</span><span class="role-desc">Explora y reserva tu
+                mesa favorita</span></div>
+            <span class="role-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </button>
+          <button class="role-card" onclick="selectRole('dueno')">
+            <div class="role-icon"><i class="fa-solid fa-store"></i></div>
+            <div class="role-info"><span class="role-name">Dueño</span><span class="role-desc">Administra tu
+                restaurante</span></div>
+            <span class="role-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </button>
+          <button class="role-card" onclick="selectRole('admin')">
+            <div class="role-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="role-info"><span class="role-name">Administrador</span><span class="role-desc">Panel de
+                supervisión</span></div>
+            <span class="role-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Paso 2: iniciar sesión / registrarse según el perfil -->
+      <div id="pane-auth" class="hidden">
+        <button class="btn-back" onclick="backToRoles()"><i class="fa-solid fa-arrow-left"></i> Cambiar perfil</button>
+        <div class="modal-header">
+          <div class="modal-badge" id="auth-badge"></div>
+          <h2 id="auth-title">Iniciar sesión</h2>
+        </div>
+        <div class="auth-tabs" id="auth-tabs">
+          <button type="button" class="auth-tab active" id="tab-login" onclick="setAuthMode('login')">Iniciar
+            sesión</button>
+          <button type="button" class="auth-tab" id="tab-register"
+            onclick="setAuthMode('register')">Registrarme</button>
+        </div>
+        <form class="form" id="auth-form" onsubmit="submitAuth(event)" novalidate>
+          <div id="field-nombre" class="hidden">
+            <label for="auth-nombre">Nombre</label>
+            <input id="auth-nombre" type="text" autocomplete="name" placeholder="Tu nombre">
+          </div>
+          <label for="auth-email">Correo</label>
+          <input id="auth-email" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com">
+          <label for="auth-pass">Contraseña</label>
+          <input id="auth-pass" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres">
+          <p class="form-error" id="auth-error" role="alert"></p>
+          <button type="submit" class="btn-primary" id="auth-submit">Iniciar sesión</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app-shell" class="page">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <a class="nav-brand" href="#" onclick="goHome(event)"><span class="brand-dot"></span>SAVORIA</a>
+      <div class="topbar-right">
+        <span id="user-name" class="user-name"></span>
+        <span id="role-badge" class="role-badge"></span>
+        <button class="btn-ghost-sm" onclick="goHome()"><i class="fa-solid fa-house"></i> Inicio</button>
+        <button class="btn-ghost-sm" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar
+          sesión</button>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- SIDEBARS -->
+      <nav class="sidebar" id="sidebar-cliente">
+        <div class="sidebar-section-title">Cliente</div>
+        <button data-screen="cliente-restaurantes" onclick="navTo('cliente-restaurantes')"><i
+            class="fa-solid fa-utensils"></i> Restaurantes</button>
+        <button data-screen="cliente-reservas" onclick="navTo('cliente-reservas')"><i
+            class="fa-solid fa-calendar-check"></i> Mis reservas</button>
+      </nav>
+      <nav class="sidebar" id="sidebar-dueno">
+        <div class="sidebar-section-title">Dueño</div>
+        <button data-screen="dueno-restaurante" onclick="navTo('dueno-restaurante')"><i class="fa-solid fa-store"></i>
+          Mi restaurante</button>
+        <button data-screen="dueno-mesas" onclick="navTo('dueno-mesas')"><i class="fa-solid fa-chair"></i>
+          Mesas</button>
+        <button data-screen="dueno-reservas" onclick="navTo('dueno-reservas')"><i
+            class="fa-solid fa-clipboard-list"></i> Reservas</button>
+      </nav>
+      <nav class="sidebar" id="sidebar-admin">
+        <div class="sidebar-section-title">Admin</div>
+        <button data-screen="admin-inicio" onclick="navTo('admin-inicio')"><i class="fa-solid fa-chart-pie"></i> Panel
+          general</button>
+      </nav>
+
+      <!-- CONTENT -->
+      <main class="content">
+
+        <!-- CLIENTE: RESTAURANTES (HU02, HU03) -->
+        <section id="cliente-restaurantes" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-utensils"></i></div>
+            <h2>Restaurantes</h2>
+          </div>
+          <div class="grid-cards" id="lista-restaurantes"></div>
+        </section>
+
+        <!-- CLIENTE: MESAS (HU04, HU05) -->
+        <section id="cliente-mesas" class="content-screen">
+          <button class="btn-back" onclick="navTo('cliente-restaurantes')"><i class="fa-solid fa-arrow-left"></i>
+            Volver</button>
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chair"></i></div>
+            <h2 id="mesas-titulo">Mesas disponibles</h2>
+          </div>
+          <p class="info-line" id="mesas-info"></p>
+          <div class="toolbar">
+            <div class="field"><label for="res-fecha">Fecha</label><input id="res-fecha" type="date"
+                onchange="cargarMesas()"></div>
+            <div class="field"><label for="res-hora">Hora</label><input id="res-hora" type="time" step="900"
+                onchange="cargarMesas()"></div>
+            <div class="field"><label for="res-personas">Personas</label><input id="res-personas" type="number" min="1"
+                max="20" value="2" onchange="cargarMesas()"></div>
+          </div>
+          <div class="floor-grid" id="mesas-grid"></div>
+          <div class="legend">
+            <span><i class="dot disponible"></i> Libre</span>
+            <span><i class="dot ocupada"></i> Ocupada o sin capacidad</span>
+          </div>
+          <div class="summary hidden" id="resumen">
+            <p id="resumen-texto"></p>
+            <button class="btn-primary" id="btn-confirmar" onclick="confirmarReserva()"><i
+                class="fa-solid fa-check"></i> Confirmar reserva</button>
+          </div>
+        </section>
+
+        <!-- CLIENTE: MIS RESERVAS (HU06) -->
+        <section id="cliente-reservas" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <h2>Mis reservas</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Restaurante</th>
+                  <th>Mesa</th>
+                  <th>Fecha y hora</th>
+                  <th>Personas</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-mis-reservas"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- DUEÑO: RESTAURANTE (HU08, HU09, HU11) -->
+        <section id="dueno-restaurante" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-store"></i></div>
+            <h2>Mi restaurante</h2>
+          </div>
+          <p class="info-line" id="rest-aviso"></p>
+          <form onsubmit="guardarRestaurante(event)" class="form" novalidate>
+            <label for="rest-nombre">Nombre del restaurante</label>
+            <input id="rest-nombre" type="text" placeholder="Ej: La Parrilla">
+            <label for="rest-ubicacion">Ubicación</label>
+            <input id="rest-ubicacion" type="text" placeholder="Ej: Calle 10 # 40-20, Medellín">
+            <label for="rest-descripcion">Descripción</label>
+            <textarea id="rest-descripcion" rows="3"
+              placeholder="Cuéntales a tus clientes qué te hace especial"></textarea>
+            <label for="rest-precio">Valor de la reserva (COP)</label>
+            <input id="rest-precio" type="number" placeholder="15000" min="0" step="500">
+            <label for="rest-duracion">Tiempo estimado por reserva (min)</label>
+            <select id="rest-duracion">
+              <option value="60">60 min (1 h)</option>
+              <option value="90" selected>90 min (1.5 h)</option>
+              <option value="120">120 min (2 h)</option>
+              <option value="150">150 min (2.5 h)</option>
+              <option value="180">180 min (3 h)</option>
+            </select>
+            <p class="form-error" id="rest-error" role="alert"></p>
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+          </form>
+        </section>
+
+        <!-- DUEÑO: MESAS (HU10) -->
+        <section id="dueno-mesas" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chair"></i></div>
+            <h2>Gestión de mesas</h2>
+          </div>
+          <p class="info-line" id="mesas-dueno-aviso"></p>
+          <div class="floor-grid" id="dueno-floor-grid"></div>
+          <div class="toolbar">
+            <div class="field"><label for="nueva-capacidad">Personas en la nueva mesa</label><input id="nueva-capacidad"
+                type="number" min="1" max="20" value="4"></div>
+            <button class="btn-primary" onclick="agregarMesa()"><i class="fa-solid fa-plus"></i> Agregar mesa</button>
+          </div>
+        </section>
+
+        <!-- DUEÑO: RESERVAS (HU12, HU13) -->
+        <section id="dueno-reservas" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+            <h2>Reservas del restaurante</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Mesa</th>
+                  <th>Fecha y hora</th>
+                  <th>Personas</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-reservas-dueno"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ADMIN: PANEL GENERAL (Sprint 5) -->
+        <section id="admin-inicio" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            <h2>Panel general</h2>
+          </div>
+          <p class="info-line">Las estadísticas y balances del administrador se habilitan en el Sprint 5. Tu sesión de
+            administrador ya funciona.</p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
