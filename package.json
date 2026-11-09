@@ -1,14 +1,19 @@
 {
   "name": "savoria",
   "version": "1.0.0",
-  "description": "SAVORIA - Sistema de reservas para restaurantes (Sprints 0-4)",
+  "description": "SAVORIA - Sistema de reservas para restaurantes (Sprints 0-5)",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "crear-admin": "node scripts/crear-admin.js"
+    "crear-admin": "node scripts/crear-admin.js",
+    "migrar": "node scripts/migrar.js",
+    "test": "node --test tests/roles.test.js",
+    "test:integracion": "node scripts/test-integracion.js"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",

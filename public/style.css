@@ -1974,3 +1974,47 @@ td .muted {
     transition: none !important;
   }
 }
+/* ── SPRINT 5: ESTADÍSTICAS ──────────────────────────────── */
+.bars { display: flex; flex-direction: column; gap: 10px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(70px, 130px) 1fr auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.bar-track {
+  height: 12px;
+  background: var(--surface-mid);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--olive), var(--olive-light));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.bar-row.pico .bar-fill { background: linear-gradient(90deg, var(--rose-dark), var(--rose)); }
+.bar-row.pico .bar-label,
+.bar-row.pico .bar-val { font-weight: 700; }
+.bar-val { color: var(--text-muted); white-space: nowrap; }
+
+/* Casilla "Combinar mesas contiguas" */
+.field.check label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.mesa.disponible.sel { outline-color: var(--olive-dark); }

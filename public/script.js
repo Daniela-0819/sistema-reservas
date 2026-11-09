@@ -111,6 +111,7 @@ let selectedRole = null;
 let authMode = "login";
 let restauranteActual = null; // restaurante que el cliente está viendo
 let mesaElegida = null;
+let mesasCombo = []; // mesas contiguas elegidas para combinar: [{ id, num, cap }]
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) =>
@@ -317,6 +318,10 @@ const LOADERS = {
   "dueno-restaurante": cargarMiRestaurante,
   "dueno-mesas": cargarMesasDueno,
   "dueno-reservas": cargarReservasDueno,
+  "cliente-stats": cargarStatsGenerales,
+  "dueno-stats": cargarStatsDueno,
+  "admin-inicio": cargarPanelAdmin,
+  "admin-balances": cargarBalancesAdmin,
 };
 
 function navTo(id) {
@@ -332,6 +337,9 @@ function navTo(id) {
     );
   LOADERS[id]?.();
 }
+
+/* "Mesa 4" o "Mesas 4, 5" (reservas con mesas contiguas combinadas) */
+const etiquetaMesa = (m) => (String(m).includes(",") ? "Mesas " : "Mesa ") + m;
 
 /* ESTADO DE LA RESERVA (ACTIVA / CANCELADA) */
 function estadoBadge(r) {
@@ -381,9 +389,34 @@ function abrirMesas(id) {
   cargarMesas();
 }
 
+/* MESAS CONTIGUAS QUE SUMAN LA CAPACIDAD NECESARIA
+   Devuelve los ids de las mesas libres que forman al menos un grupo de 2 a 4 mesas
+   con números consecutivos, cuya capacidad sumada alcanza para `personas` y sin
+   mesas de sobra (si quitas la primera o la última, ya no alcanza). */
+function mesasQueSuman(mesas, personas, maxMesas = 4) {
+  const orden = [...mesas].sort((a, b) => a.numero - b.numero);
+  const ids = new Set();
+  for (let i = 0; i < orden.length; i++) {
+    let suma = 0;
+    for (let j = i; j < orden.length && j - i < maxMesas; j++) {
+      if (!orden[j].disponible) break;
+      if (j > i && orden[j].numero !== orden[j - 1].numero + 1) break;
+      suma += orden[j].capacidad;
+      const n = j - i + 1;
+      if (n < 2 || suma < personas || personas < n) continue;
+      const sinPrimera = suma - orden[i].capacidad;
+      const sinUltima = suma - orden[j].capacidad;
+      if (sinPrimera >= personas || sinUltima >= personas) continue; // sobra una mesa
+      for (let k = i; k <= j; k++) ids.add(orden[k].id);
+    }
+  }
+  return ids;
+}
+
 async function cargarMesas() {
   if (!restauranteActual) return;
   mesaElegida = null;
+  mesasCombo = [];
   $("resumen").classList.add("hidden");
   const fecha = $("res-fecha").value,
     hora = $("res-hora").value;
@@ -407,14 +440,25 @@ async function cargarMesas() {
         '<p class="info-line">Este restaurante aún no tiene mesas registradas.</p>';
       return;
     }
+    const combinar = $("res-combinar").checked;
+    const suman = combinar ? mesasQueSuman(mesas, personas) : null;
+    if (combinar && !suman.size) {
+      $("mesas-info").innerHTML +=
+        `<br><span class="form-error">No hay mesas contiguas libres que sumen ${personas} personas en ese horario.</span>`;
+    } else if (combinar) {
+      $("mesas-info").innerHTML +=
+        `<br>Se habilitaron las mesas contiguas que juntas alcanzan para ${personas} personas. Elige las que quieras combinar.`;
+    }
     grid.innerHTML = mesas
       .map((m) => {
-        const cabe = m.capacidad >= personas;
+        const cabe = combinar ? suman.has(m.id) : m.capacidad >= personas;
         const libre = m.disponible && cabe;
         const motivo = !m.disponible
           ? "Ocupada en ese horario"
           : !cabe
-            ? "No alcanza para tu grupo"
+            ? combinar
+              ? "No forma un grupo contiguo que alcance para tu grupo"
+              : "No alcanza para tu grupo"
             : `Reservar mesa ${m.numero}`;
         return `<button class="mesa ${libre ? "disponible" : "ocupada"}" ${libre ? "" : "disabled"} title="${motivo}"
                 data-id="${m.id}" data-num="${m.numero}" data-cap="${m.capacidad}">
@@ -423,7 +467,11 @@ async function cargarMesas() {
       .join("");
     grid
       .querySelectorAll(".mesa.disponible")
-      .forEach((b) => b.addEventListener("click", () => elegirMesa(b, r)));
+      .forEach((b) =>
+        b.addEventListener("click", () =>
+          $("res-combinar").checked ? elegirMesaCombo(b, r) : elegirMesa(b, r),
+        ),
+      );
   } catch (ex) {
     showToast(esc(ex.message), "error");
   }
@@ -435,6 +483,7 @@ function elegirMesa(btn, r) {
     .querySelectorAll("#mesas-grid .mesa")
     .forEach((b) => b.classList.remove("sel"));
   btn.classList.add("sel");
+  $("btn-confirmar").disabled = false;
   mesaElegida = Number(btn.dataset.id);
   const personas = $("res-personas").value;
   $("resumen-texto").innerHTML =
@@ -443,15 +492,62 @@ function elegirMesa(btn, r) {
   $("resumen").classList.remove("hidden");
 }
 
+/* CLIENTE: COMBINAR MESAS CONTIGUAS */
+function elegirMesaCombo(btn, r) {
+  const id = Number(btn.dataset.id);
+  const i = mesasCombo.findIndex((m) => m.id === id);
+  if (i >= 0) mesasCombo.splice(i, 1);
+  else
+    mesasCombo.push({
+      id,
+      num: Number(btn.dataset.num),
+      cap: Number(btn.dataset.cap),
+    });
+  mesasCombo.sort((a, b) => a.num - b.num);
+  document
+    .querySelectorAll("#mesas-grid .mesa")
+    .forEach((b) =>
+      b.classList.toggle(
+        "sel",
+        mesasCombo.some((m) => m.id === Number(b.dataset.id)),
+      ),
+    );
+  mesaElegida = mesasCombo.length === 1 ? mesasCombo[0].id : null;
+
+  const resumen = $("resumen");
+  if (!mesasCombo.length) return resumen.classList.add("hidden");
+  const personas = Number($("res-personas").value) || 1;
+  const cap = mesasCombo.reduce((a, m) => a + m.cap, 0);
+  const contiguas = mesasCombo.every(
+    (m, k) => k === 0 || m.num === mesasCombo[k - 1].num + 1,
+  );
+  const nums = mesasCombo.map((m) => m.num).join(", ");
+  let aviso = "";
+  if (!contiguas) aviso = "Las mesas deben ser contiguas (números consecutivos).";
+  else if (mesasCombo.length > 4) aviso = "Puedes combinar máximo 4 mesas.";
+  else if (cap < personas) aviso = `Capacidad insuficiente: ${cap} de ${personas} personas.`;
+  else if (personas < mesasCombo.length) aviso = "Necesitas al menos una persona por mesa.";
+
+  $("resumen-texto").innerHTML =
+    `Mesa${mesasCombo.length > 1 ? "s" : ""} <strong>${nums}</strong> (hasta ${cap} personas) en <strong>${esc(r.nombre)}</strong><br>` +
+    `${fechaHora($("res-fecha").value + "T" + $("res-hora").value)} · ${personas} persona(s) · valor de la reserva ${money(r.valor_reserva)}` +
+    (aviso ? `<br><span class="form-error">${aviso}</span>` : "");
+  $("btn-confirmar").disabled = !!aviso;
+  resumen.classList.remove("hidden");
+}
+
 async function confirmarReserva() {
-  if (!mesaElegida) return;
+  const combinando = mesasCombo.length > 1;
+  if (!mesaElegida && !combinando) return;
   const btn = $("btn-confirmar");
   btn.disabled = true;
   try {
     await api("/reservas", {
       method: "POST",
       body: {
-        mesa_id: mesaElegida,
+        ...(combinando
+          ? { mesa_ids: mesasCombo.map((m) => m.id) }
+          : { mesa_id: mesaElegida }),
         inicio: `${$("res-fecha").value}T${$("res-hora").value}`,
         personas: Number($("res-personas").value),
       },
@@ -477,7 +573,7 @@ async function cargarMisReservas() {
           .map(
             (r) => `
       <tr>
-        <td>${esc(r.restaurante)}</td><td>Mesa ${r.mesa}</td><td>${fechaHora(r.inicio)}</td><td>${r.personas}</td>
+        <td>${esc(r.restaurante)}</td><td>${etiquetaMesa(r.mesa)}</td><td>${fechaHora(r.inicio)}</td><td>${r.personas}</td>
         <td>${estadoBadge(r)}${r.estado === "cancelada" ? `<div class="muted">${esc(r.motivo_cancelacion || "")}</div>` : ""}</td>
       </tr>`,
           )
@@ -580,7 +676,7 @@ async function cargarReservasDueno() {
           .map(
             (r) => `
       <tr>
-        <td>${esc(r.cliente)}</td><td>Mesa ${r.mesa}</td><td>${fechaHora(r.inicio)}</td><td>${r.personas}</td>
+        <td>${esc(r.cliente)}</td><td>${etiquetaMesa(r.mesa)}</td><td>${fechaHora(r.inicio)}</td><td>${r.personas}</td>
         <td>${estadoBadge(r)}</td>
         <td>${
           r.estado === "activa"
@@ -615,5 +711,130 @@ async function cancelarReserva(id) {
     cargarReservasDueno();
   } catch (ex) {
     showToast(esc(ex.message), "error");
+  }
+}
+
+/* GRÁFICAS DE BARRAS SIMPLES (sin librerías) */
+function barras(cont, filas, vacio) {
+  const max = Math.max(1, ...filas.map((f) => f.valor));
+  cont.innerHTML = filas.length
+    ? filas
+        .map(
+          (f) => `
+      <div class="bar-row${f.pico ? " pico" : ""}">
+        <span class="bar-label">${esc(f.etiqueta)}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((100 * f.valor) / max)}%"></span></span>
+        <span class="bar-val">${esc(f.texto ?? f.valor)}</span>
+      </div>`,
+        )
+        .join("")
+    : `<p class="info-line">${vacio}</p>`;
+}
+
+const horaTxt = (h) => String(h).padStart(2, "0") + ":00";
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const statCard = (icono, valor, etiqueta) => `
+  <div class="stat-card">
+    <span class="stat-icon"><i class="fa-solid ${icono}"></i></span>
+    <span class="stat-num">${esc(valor)}</span>
+    <span class="stat-label">${esc(etiqueta)}</span>
+  </div>`;
+
+/* CLIENTE: ESTADÍSTICAS GENERALES (HU07) */
+async function cargarStatsGenerales() {
+  try {
+    const d = await api("/estadisticas/generales");
+    barras(
+      $("stats-ranking"),
+      d.restaurantes_mas_reservados.map((r) => ({
+        etiqueta: r.restaurante,
+        valor: r.reservas,
+        texto: `${r.reservas} reservas · ${r.ocupacion_pct}% ocupación`,
+      })),
+      "Aún no hay reservas para comparar.",
+    );
+    const tope = Math.max(0, ...d.horarios_mas_demandados.map((h) => h.reservas));
+    barras(
+      $("stats-horas"),
+      d.horarios_mas_demandados.map((h) => ({
+        etiqueta: horaTxt(h.hora),
+        valor: h.reservas,
+        pico: h.reservas === tope && tope > 0,
+      })),
+      "Aún no hay reservas para comparar.",
+    );
+  } catch (ex) {
+    showToast(esc(ex.message), "error");
+  }
+}
+
+/* DUEÑO: ESTADÍSTICAS DE MI RESTAURANTE (HU14) */
+async function cargarStatsDueno() {
+  try {
+    const d = await api("/mi-restaurante/estadisticas");
+    if (!d.restaurante) {
+      $("dstats-aviso").textContent = 'Primero registra tu restaurante en "Mi restaurante".';
+      $("dstats-cards").innerHTML = "";
+      barras($("dstats-horas"), [], "Sin datos todavía.");
+      barras($("dstats-dias"), [], "Sin datos todavía.");
+      return;
+    }
+    $("dstats-aviso").textContent = "";
+    $("dstats-cards").innerHTML =
+      statCard("fa-calendar-check", d.reservas_activas, "Reservas activas") +
+      statCard("fa-ban", d.reservas_canceladas, "Reservas canceladas") +
+      statCard("fa-users", d.personas, "Personas esperadas") +
+      statCard("fa-chair", `${d.ocupacion_pct}%`, "Aprovechamiento de las mesas reservadas") +
+      statCard("fa-door-open", `${d.mesas_reservadas_hoy}/${d.total_mesas}`, "Mesas reservadas hoy");
+    const tope = Math.max(0, ...d.por_hora.map((h) => h.reservas));
+    barras(
+      $("dstats-horas"),
+      d.por_hora.map((h) => ({ etiqueta: horaTxt(h.hora), valor: h.reservas, pico: h.reservas === tope && tope > 0 })),
+      "Aún no tienes reservas.",
+    );
+    barras(
+      $("dstats-dias"),
+      d.por_dia.map((x) => ({ etiqueta: DIAS[x.dia], valor: x.reservas })),
+      "Aún no tienes reservas.",
+    );
+  } catch (ex) {
+    showToast(esc(ex.message), "error");
+  }
+}
+
+/* ADMIN: PANEL GENERAL (HU16) */
+async function cargarPanelAdmin() {
+  try {
+    const d = await api("/admin/resumen");
+    $("admin-cards").innerHTML =
+      statCard("fa-store", d.restaurantes_activos, "Restaurantes activos") +
+      statCard("fa-users", d.clientes_registrados, "Clientes registrados") +
+      statCard("fa-calendar-check", d.reservas_activas, "Reservas activas") +
+      statCard("fa-ban", d.reservas_canceladas, "Reservas canceladas");
+  } catch (ex) {
+    showToast(esc(ex.message), "error");
+  }
+}
+
+/* ADMIN: BALANCES POR RESTAURANTE (HU15) */
+async function cargarBalancesAdmin() {
+  const tb = $("tabla-balances");
+  tb.innerHTML = '<tr><td colspan="7">Cargando…</td></tr>';
+  try {
+    const lista = await api("/admin/balances");
+    tb.innerHTML = lista.length
+      ? lista
+          .map(
+            (b) => `
+      <tr>
+        <td>${esc(b.restaurante)}</td><td>${b.mesas}</td><td>${b.reservas_activas}</td>
+        <td>${b.reservas_canceladas}</td><td>${b.personas}</td><td>${b.ocupacion_pct}%</td>
+        <td>${money(b.valor_reservas_activas)}</td>
+      </tr>`,
+          )
+          .join("")
+      : '<tr><td colspan="7">Todavía no hay restaurantes registrados.</td></tr>';
+  } catch (ex) {
+    tb.innerHTML = `<tr><td colspan="7" class="form-error">${esc(ex.message)}</td></tr>`;
   }
 }

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { sql, getPool } = require('../db');
 const { auth, requireRol } = require('../middleware/auth');
-const { wrap, mapReserva } = require('../utils');
+const { wrap, mapReserva, nowLocal } = require('../utils');
 
 router.use(auth, requireRol('dueno'));
 
@@ -77,17 +77,68 @@ router.post('/mesas', wrap(async (req, res) => {
 }));
 
 // GET /api/mi-restaurante/reservas  (HU12)
+// Una reserva que combina mesas contiguas se muestra como una sola fila (mesa = "4, 5").
 router.get('/reservas', wrap(async (req, res) => {
   const pool = await getPool();
   const r = await pool.request().input('uid', sql.Int, req.user.id).query(`
-    SELECT rv.id, u.nombre AS cliente, m.numero AS mesa, rv.inicio, rv.fin, rv.personas, rv.estado, rv.motivo_cancelacion
+    SELECT MIN(rv.id) AS id, MIN(u.nombre) AS cliente,
+           STRING_AGG(CAST(m.numero AS NVARCHAR(10)), ', ') WITHIN GROUP (ORDER BY m.numero) AS mesa,
+           MIN(rv.inicio) AS inicio, MIN(rv.fin) AS fin, SUM(rv.personas) AS personas,
+           MIN(rv.estado) AS estado, MIN(rv.motivo_cancelacion) AS motivo_cancelacion
     FROM Reservas rv
     JOIN Mesas m ON m.id = rv.mesa_id
     JOIN Restaurantes r ON r.id = m.restaurante_id
     JOIN Usuarios u ON u.id = rv.cliente_id
     WHERE r.dueno_id = @uid
-    ORDER BY rv.inicio DESC`);
+    GROUP BY COALESCE(rv.grupo_id, rv.id)
+    ORDER BY MIN(rv.inicio) DESC`);
   res.json(r.recordset.map(mapReserva));
+}));
+
+// GET /api/mi-restaurante/estadisticas  (HU14) -> solo datos del restaurante del dueño
+router.get('/estadisticas', wrap(async (req, res) => {
+  const pool = await getPool();
+  const restaurante = await getRestauranteDe(pool, req.user.id);
+  if (!restaurante) return res.json({ restaurante: null });
+  const rid = restaurante.id;
+  const q = (texto) => pool.request().input('rid', sql.Int, rid).input('hoy', sql.DateTime2, nowLocal()).query(texto);
+
+  const [tot, horas, dias, hoy, mesas] = await Promise.all([
+    q(`SELECT SUM(CASE WHEN rv.estado = 'activa' AND rv.grupo_id IS NULL THEN 1 ELSE 0 END) AS activas,
+              SUM(CASE WHEN rv.estado = 'cancelada' AND rv.grupo_id IS NULL THEN 1 ELSE 0 END) AS canceladas,
+              SUM(CASE WHEN rv.estado = 'activa' THEN rv.personas ELSE 0 END) AS personas,
+              SUM(CASE WHEN rv.estado = 'activa' THEN m.capacidad ELSE 0 END) AS capacidad
+       FROM Reservas rv JOIN Mesas m ON m.id = rv.mesa_id WHERE m.restaurante_id = @rid`),
+    q(`SELECT DATEPART(HOUR, rv.inicio) AS hora, COUNT(*) AS reservas
+       FROM Reservas rv JOIN Mesas m ON m.id = rv.mesa_id
+       WHERE m.restaurante_id = @rid AND rv.estado = 'activa' AND rv.grupo_id IS NULL
+       GROUP BY DATEPART(HOUR, rv.inicio) ORDER BY hora`),
+    q(`SELECT DATEDIFF(DAY, '19000101', rv.inicio) % 7 AS dia, COUNT(*) AS reservas
+       FROM Reservas rv JOIN Mesas m ON m.id = rv.mesa_id
+       WHERE m.restaurante_id = @rid AND rv.estado = 'activa' AND rv.grupo_id IS NULL
+       GROUP BY DATEDIFF(DAY, '19000101', rv.inicio) % 7 ORDER BY dia`),
+    q(`SELECT COUNT(DISTINCT rv.mesa_id) AS mesas_hoy
+       FROM Reservas rv JOIN Mesas m ON m.id = rv.mesa_id
+       WHERE m.restaurante_id = @rid AND rv.estado = 'activa' AND CAST(rv.inicio AS DATE) = CAST(@hoy AS DATE)`),
+    q('SELECT COUNT(*) AS total FROM Mesas WHERE restaurante_id = @rid'),
+  ]);
+
+  const t = tot.recordset[0] || {};
+  const totalMesas = mesas.recordset[0].total;
+  const mesasHoy = hoy.recordset[0].mesas_hoy;
+  res.json({
+    restaurante: { id: restaurante.id, nombre: restaurante.nombre },
+    reservas_activas: t.activas || 0,
+    reservas_canceladas: t.canceladas || 0,
+    personas: t.personas || 0,
+    // % de aprovechamiento de las sillas de las mesas reservadas
+    ocupacion_pct: t.capacidad ? Math.round((100 * t.personas) / t.capacidad) : 0,
+    total_mesas: totalMesas,
+    mesas_reservadas_hoy: mesasHoy,
+    ocupacion_hoy_pct: totalMesas ? Math.round((100 * mesasHoy) / totalMesas) : 0,
+    por_hora: horas.recordset.map((h) => ({ hora: h.hora, reservas: h.reservas })),
+    por_dia: dias.recordset.map((d) => ({ dia: d.dia, reservas: d.reservas })), // 0 = lunes
+  });
 }));
 
 module.exports = router;

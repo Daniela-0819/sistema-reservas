@@ -274,6 +274,8 @@
             class="fa-solid fa-utensils"></i> Restaurantes</button>
         <button data-screen="cliente-reservas" onclick="navTo('cliente-reservas')"><i
             class="fa-solid fa-calendar-check"></i> Mis reservas</button>
+        <button data-screen="cliente-stats" onclick="navTo('cliente-stats')"><i class="fa-solid fa-chart-line"></i>
+          Estadísticas</button>
       </nav>
       <nav class="sidebar" id="sidebar-dueno">
         <div class="sidebar-section-title">Dueño</div>
@@ -283,11 +285,15 @@
           Mesas</button>
         <button data-screen="dueno-reservas" onclick="navTo('dueno-reservas')"><i
             class="fa-solid fa-clipboard-list"></i> Reservas</button>
+        <button data-screen="dueno-stats" onclick="navTo('dueno-stats')"><i class="fa-solid fa-chart-column"></i>
+          Estadísticas</button>
       </nav>
       <nav class="sidebar" id="sidebar-admin">
         <div class="sidebar-section-title">Admin</div>
         <button data-screen="admin-inicio" onclick="navTo('admin-inicio')"><i class="fa-solid fa-chart-pie"></i> Panel
           general</button>
+        <button data-screen="admin-balances" onclick="navTo('admin-balances')"><i class="fa-solid fa-scale-balanced"></i>
+          Balances</button>
       </nav>
 
       <!-- CONTENT -->
@@ -318,6 +324,8 @@
                 onchange="cargarMesas()"></div>
             <div class="field"><label for="res-personas">Personas</label><input id="res-personas" type="number" min="1"
                 max="20" value="2" onchange="cargarMesas()"></div>
+            <div class="field check"><label for="res-combinar"><input id="res-combinar" type="checkbox"
+                  onchange="cargarMesas()"> Combinar mesas contiguas</label></div>
           </div>
           <div class="floor-grid" id="mesas-grid"></div>
           <div class="legend">
@@ -350,6 +358,25 @@
               </thead>
               <tbody id="tabla-mis-reservas"></tbody>
             </table>
+          </div>
+        </section>
+
+        <!-- CLIENTE: ESTADÍSTICAS GENERALES (HU07) -->
+        <section id="cliente-stats" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h2>Estadísticas generales</h2>
+          </div>
+          <p class="info-line">Datos agregados de todos los restaurantes. No incluyen información personal.</p>
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header"><h3><i class="fa-solid fa-trophy"></i> Restaurantes más reservados</h3></div>
+              <div class="bars" id="stats-ranking"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header"><h3><i class="fa-regular fa-clock"></i> Horarios más demandados</h3></div>
+              <div class="bars" id="stats-horas"></div>
+            </div>
           </div>
         </section>
 
@@ -421,14 +448,60 @@
           </div>
         </section>
 
-        <!-- ADMIN: PANEL GENERAL (Sprint 5) -->
+        <!-- DUEÑO: ESTADÍSTICAS DE MI RESTAURANTE (HU14) -->
+        <section id="dueno-stats" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chart-column"></i></div>
+            <h2>Estadísticas de mi restaurante</h2>
+          </div>
+          <p class="info-line" id="dstats-aviso"></p>
+          <div class="grid-cards stats" id="dstats-cards"></div>
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header"><h3><i class="fa-regular fa-clock"></i> Horarios pico</h3></div>
+              <div class="bars" id="dstats-horas"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header"><h3><i class="fa-regular fa-calendar"></i> Reservas por día de la semana</h3></div>
+              <div class="bars" id="dstats-dias"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ADMIN: PANEL GENERAL (HU16) -->
         <section id="admin-inicio" class="content-screen">
           <div class="section-header">
             <div class="section-icon"><i class="fa-solid fa-chart-pie"></i></div>
             <h2>Panel general</h2>
           </div>
-          <p class="info-line">Las estadísticas y balances del administrador se habilitan en el Sprint 5. Tu sesión de
-            administrador ya funciona.</p>
+          <p class="info-line">Estado de la plataforma. Solo se muestran conteos: el administrador no accede a datos
+            personales.</p>
+          <div class="grid-cards stats" id="admin-cards"></div>
+        </section>
+
+        <!-- ADMIN: BALANCES POR RESTAURANTE (HU15) -->
+        <section id="admin-balances" class="content-screen">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h2>Balances por restaurante</h2>
+          </div>
+          <p class="info-line">Métricas agregadas por restaurante. El valor es referencial: SAVORIA no procesa pagos.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Restaurante</th>
+                  <th>Mesas</th>
+                  <th>Reservas activas</th>
+                  <th>Canceladas</th>
+                  <th>Personas</th>
+                  <th>Ocupación</th>
+                  <th>Valor de reservas activas</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-balances"></tbody>
+            </table>
+          </div>
         </section>
 
       </main>

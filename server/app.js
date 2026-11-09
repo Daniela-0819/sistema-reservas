@@ -8,6 +8,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/restaurantes', require('./routes/restaurantes'));
 app.use('/api/mi-restaurante', require('./routes/miRestaurante'));
 app.use('/api/reservas', require('./routes/reservas'));
+app.use('/api/estadisticas', require('./routes/estadisticas'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
